@@ -1,0 +1,14 @@
+  1           0 LOAD_CONST               0 (3)
+              2 STORE_NAME               0 (a)
+
+  2           4 LOAD_CONST               1 (5)
+              6 STORE_NAME               1 (b)
+
+  3           8 LOAD_NAME                2 (print)
+             10 LOAD_NAME                0 (a)
+             12 LOAD_NAME                1 (b)
+             14 BINARY_ADD
+             16 CALL_FUNCTION            1
+             18 POP_TOP
+             20 LOAD_CONST               2 (None)
+             22 RETURN_VALUE
