@@ -1,6 +1,6 @@
 import common.FileHelper
 
-import scala.collection.mutable.ListBuffer
+import scala.collection.mutable.{ListBuffer, Map}
 import sys.process._
 import scala.language.postfixOps
 
@@ -18,9 +18,19 @@ object Compiler extends App {
   val assemblyFilePath = "intermediateFiles/assembly/"
   val assemblyFileName = "test.txt"
 
-  val newLine = """^\s*([0-9]+)\s{2,}.*([0-9]+)\s+([A-Z_]+)\s+([0-9]+)?\s*([A-Za-z0-9()'<>]+)?\s*$""".r
-  val notANewLine = """^\s+([0-9]+)\s+([A-Z_]+)\s+([0-9]+)?\s*([A-Za-z0-9()'<>]+)?\s*$""".r
+  var IndexToInstruction = Map[Int, String]()
+  var instructions = new ListBuffer[String]()
+  var numbers = new ListBuffer[String]()
+  var names = new ListBuffer[String]()
+
+  //val newLine = """^\s*([0-9]+)\s{2,}.*([0-9]+)\s+([A-Z_]+)\s+([0-9]+)?\s*([A-Za-z0-9()' <>]+)?\s*$""".r
+  //val notANewLine = """^\s+([0-9]+)\s+([A-Z_]+)\s+([0-9]+)?\s*([A-Za-z0-9()' <>]+)?\s*$""".r
   val onlyInstruction = """^\s*([0-9]+)\s+([A-Z_]+)\s*$""".r
+  val newLineGOTO = """^\s*([0-9]+)\s+([>]+)\s+([0-9]+)\s+([A-Z_]+)\s+([0-9]+)?\s*([A-Za-z0-9()' <>]+)?\s*$""".r
+  val notANewLineGOTO = """^\s*([>]+)\s+([0-9]+)\s+([A-Z_]+)\s+([0-9]+)?\s*([A-Za-z0-9()' <>]+)?\s*$""".r
+  val newLine = """^\s*([0-9]+)\s+([0-9]+)\s+([A-Z_]+)\s+([0-9]+)?\s*([A-Za-z0-9()' <>]+)?\s*$""".r
+  val notANewLine = """^\s+([0-9]+)\s+([A-Z_]+)\s+([0-9]+)?\s*([A-Za-z0-9()' <>]+)?\s*$""".r
+  val onlyInstructionGOTO = """^\s*([>]+)\s+([0-9]+)\s+([A-Z_]+)\s*$""".r
 
   // fetch the assembly file and transform it such that our interpreter would be able to use it.
   FileHelper.using(io.Source.fromFile(assemblyFilePath + assemblyFileName)) {
@@ -28,12 +38,25 @@ object Compiler extends App {
       source.getLines().foreach { line =>
         println(line)
         line match {
-        case newLine(lineNumber, instructionIndex, instruction, index, value) =>
-          println(lineNumber, instructionIndex, instruction, index, value)
-        case notANewLine(instructionIndex, instruction, index, value) =>
-          println(instructionIndex, instruction, index, value)
-        case onlyInstruction(instructionIndex, instruction) => println(instructionIndex, instruction)
-        case _ => println("")
+          case newLineGOTO(lineNumber, goto, instructionIndex, instruction, index, value) =>
+            println(lineNumber, goto, instructionIndex, instruction, index, value)
+
+          case notANewLineGOTO(goto, instructionIndex, instruction, index, value) =>
+            println(goto, instructionIndex, instruction, index, value)
+
+          case newLine(lineNumber, instructionIndex, instruction, index, value) =>
+            println(lineNumber, instructionIndex, instruction, index, value)
+
+          case notANewLine(instructionIndex, instruction, index, value) =>
+            println(instructionIndex, instruction, index, value)
+
+          case onlyInstructionGOTO(goto, instructionIndex, instruction) =>
+            println(goto, instructionIndex, instruction)
+
+          case onlyInstruction(instructionIndex, instruction) =>
+            println(instructionIndex, instruction)
+
+          case _ => println("Nothing")
         }
       }
   }
