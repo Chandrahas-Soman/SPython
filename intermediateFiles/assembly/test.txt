@@ -1,30 +1,28 @@
   1           0 LOAD_CONST               0 (3)
               2 STORE_NAME               0 (a)
 
-  2           4 LOAD_CONST               1 (5)
+  2           4 LOAD_CONST               1 ('b')
               6 STORE_NAME               1 (b)
 
-  3           8 LOAD_CONST               2 (9202)
+  3           8 LOAD_CONST               2 (0)
              10 STORE_NAME               2 (c)
 
-  4          12 SETUP_LOOP              32 (to 46)
-        >>   14 LOAD_NAME                0 (a)
-             16 LOAD_NAME                1 (b)
-             18 COMPARE_OP               0 (<)
-             20 POP_JUMP_IF_FALSE       44
+  4          12 LOAD_CONST              10 (-23)
+             14 STORE_NAME               3 (d)
 
-  5          22 LOAD_NAME                3 (print)
-             24 LOAD_NAME                0 (a)
-             26 LOAD_NAME                1 (b)
-             28 BINARY_ADD
-             30 CALL_FUNCTION            1
-             32 POP_TOP
+  5          16 LOAD_CONST              11 (-0.6)
+             18 STORE_NAME               4 (e)
 
-  6          34 LOAD_NAME                0 (a)
-             36 LOAD_CONST               3 (1)
-             38 INPLACE_ADD
-             40 STORE_NAME               0 (a)
-             42 JUMP_ABSOLUTE           14
-        >>   44 POP_BLOCK
-        >>   46 LOAD_CONST               4 (None)
-             48 RETURN_VALUE
+  6          20 LOAD_CONST               5 ('d')
+             22 STORE_NAME               5 (f)
+
+  7          24 LOAD_CONST               6 (3.2)
+             26 STORE_NAME               6 (g)
+
+  8          28 LOAD_CONST               7 ('')
+             30 STORE_NAME               7 (h)
+
+  9          32 LOAD_CONST               8 ('This is a String')
+             34 STORE_NAME               8 (i)
+             36 LOAD_CONST               9 (None)
+             38 RETURN_VALUE
