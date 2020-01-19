@@ -1,2 +1,2 @@
 # SPython
-Scala implementation of Python Bytecode runner
+This repository contains Scala implementation of Tiny Python Interpreter.
