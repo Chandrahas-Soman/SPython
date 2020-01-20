@@ -1,133 +1,32 @@
-import common.FileHelper
+package csoman.interpreter
 
 import scala.collection.mutable.{ListBuffer, Map}
-import sys.process._
-import scala.language.postfixOps
 
-// later pass python file to the class as well
-object Compiler extends App {
+class TinyInterpreter(val dataStack: ListBuffer[String]) {
 
-  // running a shell script from scala
-  try {
-    "scripts/generateAssembly.sh" !!
-  }
-  catch {
-    case t: Throwable => println("Exception while converting python code to assembly code: "+ t)
-  }
-
-  val assemblyFilePath = "intermediateFiles/assembly/"
-  val assemblyFileName = "test.txt"
-
-  var IndexToInstruction = Map[Int, String]()
-  var instructions = new ListBuffer[(String, Any)]()
-  var variableValues = new ListBuffer[String]() // numbers
-  var variableNames = new ListBuffer[String]() // names
-
-  val newLineGOTO = """^\s*([0-9]+)\s+([>]+)\s+([0-9]+)\s+([A-Z_]+)\s+([0-9]+)?\s*([-A-Za-z0-9_, '!@#$%^&*()<>{}.+=]+)?\s*$""".r
-  val notANewLineGOTO = """^\s*([>]+)\s+([0-9]+)\s+([A-Z_]+)\s+([0-9]+)?\s*([-A-Za-z0-9_, !@#$%^&'*()<>{}.+=]+)?\s*$""".r
-  val newLine = """^\s*([0-9]+)\s+([0-9]+)\s+([A-Z_]+)\s+([0-9]+)?\s*([-A-Za-z0-9_, !@#$%^&*()<>{'}.+=]+)?\s*$""".r
-  val notANewLine = """^\s+([0-9]+)\s+([A-Z_]+)\s+([0-9]+)?\s*([-A-Za-z0-9_, !@#$%^&*()<>{}.+'=]+)?\s*$""".r
-  val onlyInstruction = """^\s*([0-9]+)\s+([A-Z_]+)\s*$""".r
-  val onlyInstructionGOTO = """^\s*([>]+)\s+([0-9]+)\s+([A-Z_]+)\s*$""".r
-
-  // limitation on variable name
-  val variableNamesConstraint = """^([(]{1})([-A-Za-z_]+)([)]{1})$""".r // otherwise illegal variable name
-
-  val notVariableNames = Set("False",    "class",    "finally",    "is",    "return",    "None",
-    "for",    "lambda",    "try",    "True",    "def	",    "from",    "nonlocal",    "while",
-    "and",    "del",    "global",    "not",    "with",    "as",    "elif",    "if",  "continue",
-    "or",    "yield",    "assert",    "else",    "import",    "pass",    "break",    "except",
-    "in",    "raise")
-
-  // It is time to assign type to dynamically typed language!
-  // Considering only Boolean, Int, String and Float types!!
-  val stringValueRegex = """^([(]{1}[']{1})([-A-Za-z0-9_, !@#$%^&*()<>{}.+=]*)([']{1}[)]{1})$""".r
-  val variableValueRegex = """^([(]{1})([-0-9.]*)([)]{1})$""".r
-
-  // --> Cannot use Regex to distinguish between variable names and values! Need to have something else.
-  // Let's distinguish them on the basis on the instruction in hand.
+  //@TODO group instructions by functionality
+  def LOAD_CONST() = ???
+  def LOAD_NAME() = ???
+  def STORE_NAME() = ???
+  def BINARY_ADD() = ???
+  def POP_TOP() = ???
+  def RETURN_VALUE() = ???
+  def SETUP_LOOP() = ???
+  def COMPARE_OP() = ???
+  def POP_JUMP_IF_FALSE() = ???
+  def CALL_FUNCTION() = ???
+  def INPLACE_ADD() = ???
+  def JUMP_ABSOLUTE() = ???
+  def POP_BLOCK() = ???
+  def JUMP_FORWARD() = ???
 
 
-  // fetch the assembly file and transform it such that our interpreter would be able to use it.
-  FileHelper.using(io.Source.fromFile(assemblyFilePath + assemblyFileName)) {
-    source =>
-      source.getLines().foreach { line =>
-        println(line)
-        line match {
-          case newLineGOTO(lineNumber, goto, instructionIndex, instruction, index, value) =>
-            println(lineNumber, goto, instructionIndex, instruction, index, value)
-            //println(instruction,value)
-            instructions += instruction -> index.toInt
+  //TODO Loop through every instruction and use pattern matching
+  def runCode(whatToExecute: Map[String, Any]) = ???
 
-            value match {
-              case variableNamesConstraint(_,variableName,_) =>
-                if (!notVariableNames.contains(variableName)) variableNames += variableName
-                else ()
-              case stringValueRegex(_,variableValue,_) => variableValues += variableValue
-              case variableValueRegex(_,variableValue,_) => variableValues += variableValue
-              case _ => println(s"didn't match: ${value}")
-            }
-
-          case notANewLineGOTO(goto, instructionIndex, instruction, index, value) =>
-            println(goto, instructionIndex, instruction, index, value)
-            //println(instruction,value)
-            instructions += ((instruction, index.toInt))
-
-            value match {
-              case variableNamesConstraint(_,variableName,_) =>
-                if (!notVariableNames.contains(variableName)) variableNames += variableName
-                else ()
-              case stringValueRegex(_,variableValue,_) => variableValues += variableValue
-              case variableValueRegex(_,variableValue,_) => variableValues += variableValue
-              case _ => println(s"didn't match: ${value}")
-            }
-
-          case newLine(lineNumber, instructionIndex, instruction, index, value) =>
-            println(lineNumber, instructionIndex, instruction, index, value)
-            //println(instruction,value)
-            instructions += instruction -> index.toInt
-
-            value match {
-              case variableNamesConstraint(_,variableName,_) =>
-                if (!notVariableNames.contains(variableName)) variableNames += variableName
-                else ()
-              case stringValueRegex(_,variableValue,_) => variableValues += variableValue
-              case variableValueRegex(_,variableValue,_) => variableValues += variableValue
-              case _ => println(s"didn't match: ${value}")
-            }
-
-          case notANewLine(instructionIndex, instruction, index, value) =>
-            println(instructionIndex, instruction, index, value)
-            //println(instruction,value)
-            instructions += ((instruction, index.toInt))
-
-            value match {
-              case variableNamesConstraint(_,variableName,_) =>
-                if (!notVariableNames.contains(variableName)) variableNames += variableName
-                else ()
-              case stringValueRegex(_,variableValue,_) => variableValues += variableValue
-              case variableValueRegex(_,variableValue,_) => variableValues += variableValue
-              case _ => println(s"didn't match: ${value}")
-            }
-
-          case onlyInstructionGOTO(goto, instructionIndex, instruction) =>
-            println(goto, instructionIndex, instruction)
-            instructions += ((instruction, "None"))
-
-          case onlyInstruction(instructionIndex, instruction) =>
-            println(instructionIndex, instruction)
-            instructions += ((instruction, "None"))
-
-          case _ => ()//println("Nothing")
-        }
-      }
-  }
-//  println("--------------")
-//  variableValues.foreach(println)
-//  println("--------------")
-//  variableNames.foreach(println)
-//  instructions.foreach(println)
 }
+
+
 //  def LOAD_VALUE(number: Int) = {
 //    stack += number
 //    println(s"loaded value $number")
