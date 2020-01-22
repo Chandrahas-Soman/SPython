@@ -8,10 +8,15 @@ import org.scalatestplus.junit.JUnitRunner
 // Boolean, None, assignment failure
 // remaining --> Referencing, Other Data Types, like List, Set, Dictionaries, Mutability / Immutability, ..
 
+/*
 
+  exhaustive testing is not possible
+  therefore, testing a general case and corner cases!
+  max_val, min_val, 0
+ */
 
 @RunWith(classOf[JUnitRunner])
-class BasicTest extends FunSuite with TestSuite {
+class GeneralTest extends FunSuite with TestSuite {
 
   test("assignment operator test", Tag("Compiler")) {
 
